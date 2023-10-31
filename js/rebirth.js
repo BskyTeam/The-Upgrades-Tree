@@ -276,7 +276,7 @@ addLayer("p", {
     gainExp() { // Calculate the exponent on main currency from bonuses
         return new Decimal(1)
     },
-    row: 1, // Row the layer is in on the tree (0 is the first row)
+    row: 2, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
         {key: "p", description: "P: Reset for prestige points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
@@ -350,31 +350,58 @@ addLayer("p", {
 })
 addLayer("ur", {
     name: "ultra rebirth", // This is optional, only used in a few places, If absent it just uses the layer id.
-    symbol: "P", // This appears on the layer's node. Default is the id with the first letter capitalized
-    position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+    symbol: "UR", // This appears on the layer's node. Default is the id with the first letter capitalized
+    position: 2, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
     startData() { return {
         unlocked: true,
 		    points: new Decimal(0),
+        power: new Decimal(0),
     }},
     color: "#775cff", 
-    requires: new Decimal(25000), // Can be a function that takes requirement increases into account
+    requires: new Decimal(1000), // Can be a function that takes requirement increases into account
     resource: "ultra rebirths", // Name of prestige currency
     baseResource: "rebirth points", // Name of resource prestige is based on
-    baseAmount() {return player.points}, // Get the current amount of baseResource
+    baseAmount() {return player.r.points}, // Get the current amount of baseResource
     type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 0.5, // Prestige currency exponent
     gainMult() { // Calculate the multiplier for main currency from bonuses
         let mult = new Decimal(1)
+        
         return mult
     },
     canBuyMax() { return hasMilestone("ur", 2) },
     gainExp() { // Calculate the exponent on main currency from bonuses
         return new Decimal(1)
     },
-    row: 2, // Row the layer is in on the tree (0 is the first row)
+    row: 0, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
         {key: "shift+u", description: "U: Reset for ultra rebirth points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
     layerShown(){return true},
+      effBase() {
+			  let base = new Decimal(2);
+        
+        return base;
+      },
+      effect() { 
+			let eff = Decimal.pow(this.effBase(), player.ur.points.plus(1)).sub(1).max(0);
+			return eff;
+		},
+        
+      effectDescription() {
+			return "which are generating "+format(tmp.ur.effect)+" Ultra Power/sec"},
+		  update(diff) {
+			if (player.ur.unlocked) player.ur.power = player.ur.power.plus(tmp.ur.effect.times(diff));
+		},
+      powerExp() {
+			let exp = new Decimal(1/3);
+      return exp;
+      },
+      powerEff() {
+			  if (!unl(this.layer)) return new Decimal(1);
+			  return player.ur.power.plus(1).pow(this.powerExp());
+		},
+      
+      
   
 })
