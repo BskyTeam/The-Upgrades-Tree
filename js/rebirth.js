@@ -17,7 +17,7 @@ addLayer("r", {
         mult = new Decimal(1)
         if (hasMilestone("r", 0)) mult = mult.times(1.5)
         if (hasUpgrade("r", 32)) mult = mult.times(1.5)
-        if (hasUpgrade("p", 11)) mult = mult.times(2)
+        if (hasUpgrade("p", 11)) mult = mult.times(1.5)
         if (hasUpgrade("p", 13)) mult = mult.times(1.25)
         if (hasUpgrade("p", 14)) mult = mult.plus(1)
         
@@ -99,7 +99,7 @@ addLayer("r", {
     24: {
         title: "Point Booster (Rebirth Points 2)",
         description: "Boost Points Based on Rebirth Points(More)",
-        cost: new Decimal(250),
+        cost: new Decimal(650),
         effect() {
           let eff = player.r.points.plus(1).pow(0.2);
           return eff;
@@ -167,7 +167,7 @@ milestones: {
     requirementDescription: "1000 Rebirth Points",
     effectDescription: "Unlock a Challenge",
     done() { return player.r.best.gte(1000) },
-    unlocked() { return hasMilestone("r", 0) },
+    unlocked() { return false},
     },
 
 
@@ -210,7 +210,7 @@ tabFormat: {
         "milestones",
         ],
     },
-    "Challenges": {
+    "Challenges (WIP)": {
     content:[
         function() {if (player.tab == "r") return "main-display"},
         "prestige-button",
@@ -234,12 +234,12 @@ microtabs: {
             ],
             
         },
-        "MultiUpgrades": {
+        "MultiUpgrades(Coming Soon)": {
             content: [
                 ["infobox", "Added"],
                 "blank",
                 "upgrades2",
-                function () {if (player.tab == "r" && player.subtabs.r.mainTabs == "Main" && player.subtabs.r.AllUpgrades == "MultiUpgrades") return ["upgrades2",[11,12,13]]},
+                function () {if (player.tab == "r" && player.subtabs.r.mainTabs == "Main" && player.subtabs.r.AllUpgrades == "MultiUpgrades(Coming Soon)") return ["upgrades2",[11,12,13]]},
                 "blank"
             ],
             buttonStyle: {"border-color": "#ff0000ff"},
@@ -263,7 +263,7 @@ addLayer("p", {
     baseResource: "points", // Name of resource prestige is based on
     baseAmount() {return player.points}, // Get the current amount of baseResource
     type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
-    exponent: 0.55, // Prestige currency exponent
+    exponent: 0.45, // Prestige currency exponent
     gainMult() { // Calculate the multiplier for main currency from bonuses
         let mult = new Decimal(1)
         if (hasMilestone("p", 31)) mult = mult.times(1.5)
@@ -306,20 +306,19 @@ addLayer("p", {
         },
         21: {
             title: "Points and Rebirth",
-            description: "Both Rebirth Points and Normal Point Gain are Increased Based On Prestige Points",
+            description: "Both Rebirth Points and Normal Point Gain are Increased Based On Prestige Poi            let eff = player.pnts",
             cost: new Decimal(14),
             effect() {
-            let eff = player.p.points.plus(1).pow(0.2);
+              let eff = player.p.points.plus(1).pow(0.4);
               return eff;
             },
             effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }, // Add formatting to the effect
+            unlocked() {return hasUpgrade("p", 21)}
         },
         22: {
             title: "Unlock Rebirth Multipler Upgrades",
-            description: "Multi. Upgrades for Point Multiplication",
-            cost: new Decimal(4),
+            description: "Multi. Upgrades for Point Multiply",
             unlocked() { return false},
-            unlocked() { return hasUpgrade("p", 21) },
         },
 
 
@@ -333,7 +332,7 @@ addLayer("p", {
 
 
         },
-        1: {
+        1: { 
         requirementDescription: "2 Prestige Points",
         effectDescription: "Unlock a New Rebirth Upgrade Prepared",
         done() { return player.p.best.gte(2) },
@@ -348,4 +347,34 @@ addLayer("p", {
         unlocked() { return hasMilestone("p", 0) },
     },
 },
-})             
+})
+addLayer("ur", {
+    name: "ultra rebirth", // This is optional, only used in a few places, If absent it just uses the layer id.
+    symbol: "P", // This appears on the layer's node. Default is the id with the first letter capitalized
+    position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+    startData() { return {
+        unlocked: true,
+		    points: new Decimal(0),
+    }},
+    color: "#775cff", 
+    requires: new Decimal(25000), // Can be a function that takes requirement increases into account
+    resource: "ultra rebirths", // Name of prestige currency
+    baseResource: "rebirth points", // Name of resource prestige is based on
+    baseAmount() {return player.points}, // Get the current amount of baseResource
+    type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+    exponent: 0.5, // Prestige currency exponent
+    gainMult() { // Calculate the multiplier for main currency from bonuses
+        let mult = new Decimal(1)
+        return mult
+    },
+    canBuyMax() { return hasMilestone("ur", 2) },
+    gainExp() { // Calculate the exponent on main currency from bonuses
+        return new Decimal(1)
+    },
+    row: 2, // Row the layer is in on the tree (0 is the first row)
+    hotkeys: [
+        {key: "shift+u", description: "U: Reset for ultra rebirth points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+    ],
+    layerShown(){return true},
+  
+})
