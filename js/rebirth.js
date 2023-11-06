@@ -4,7 +4,10 @@ addLayer("r", {
     position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
     startData() { return {
         unlocked: true,
-		points: new Decimal(0),
+		  points: new Decimal(0),
+      best: new Decimal(0),
+			total: new Decimal(0),
+			pseudoUpgs: [],
     }},
     color: "#1bace7",
     requires: new Decimal(10), // Can be a function that takes requirement increases into account
@@ -234,17 +237,6 @@ microtabs: {
             ],
             
         },
-        "MultiUpgrades(Coming Soon)": {
-            content: [
-                ["infobox", "Added"],
-                "blank",
-                "upgrades2",
-                function () {if (player.tab == "r" && player.subtabs.r.mainTabs == "Main" && player.subtabs.r.AllUpgrades == "MultiUpgrades(Coming Soon)") return ["upgrades2",[11,12,13]]},
-                "blank"
-            ],
-            buttonStyle: {"border-color": "#ff0000ff"},
-            unlocked() {}
-        },
     },
 },
     
@@ -256,6 +248,9 @@ addLayer("p", {
     startData() { return {
         unlocked: true,
 		    points: new Decimal(0),
+        best: new Decimal(0),
+			  total: new Decimal(0),
+			  pseudoUpgs: [],
     }},
     color: "#fbff08",
     requires: new Decimal(250000), // Can be a function that takes requirement increases into account
@@ -280,7 +275,7 @@ addLayer("p", {
     hotkeys: [
         {key: "p", description: "P: Reset for prestige points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
-    layerShown(){return true},
+    layerShown(){return player.r.unlocked},
       
   upgrades: {
         rows: 2,
@@ -306,7 +301,7 @@ addLayer("p", {
         },
         21: {
             title: "Points and Rebirth",
-            description: "Both Rebirth Points and Normal Point Gain are Increased Based On Prestige Poi            let eff = player.pnts",
+            description: "Both Rebirth Points and Normal Point Gain are Increased Based On Prestige Points",
             cost: new Decimal(14),
             effect() {
               let eff = player.p.points.plus(1).pow(0.4);
@@ -351,11 +346,16 @@ addLayer("p", {
 addLayer("ur", {
     name: "ultra rebirth", // This is optional, only used in a few places, If absent it just uses the layer id.
     symbol: "UR", // This appears on the layer's node. Default is the id with the first letter capitalized
-    position: 2, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+    position: 1, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
     startData() { return {
         unlocked: true,
 		    points: new Decimal(0),
         power: new Decimal(0),
+        best: new Decimal(0),
+			  total: new Decimal(0),
+			  pseudoUpgs: [],
+			  first: 0,
+			  auto: false,
     }},
     color: "#775cff", 
     requires: new Decimal(1000), // Can be a function that takes requirement increases into account
@@ -373,35 +373,72 @@ addLayer("ur", {
     gainExp() { // Calculate the exponent on main currency from bonuses
         return new Decimal(1)
     },
-    row: 0, // Row the layer is in on the tree (0 is the first row)
+    row: 3, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
         {key: "shift+u", description: "U: Reset for ultra rebirth points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
-    layerShown(){return true},
-      effBase() {
-			  let base = new Decimal(2);
-        
-        return base;
+    layerShown(){return player.r.unlocked},
+      effect( ) {
+        return new Decimal(1);
+        let eff = player.ur.points.plus(1).pow(0.4);
+
+
+        return eff
       },
-      effect() { 
-			let eff = Decimal.pow(this.effBase(), player.ur.points.plus(1)).sub(1).max(0);
-			return eff;
+      addToBase() {
+			let base = new Decimal(0);
+			return base;
 		},
-        
+      effectBase() {
+			let base = new Decimal(2);
+			
+			// ADD
+			base = base.plus(tmp.ur.addToBase);
+		
+			// MULTIPLY
+			return base.pow(tmp.ur.power);
+		},
+      power() {
+			let power = new Decimal(1);
+			return power;
+		},
       effectDescription() {
-			return "which are generating "+format(tmp.ur.effect)+" Ultra Power/sec"},
-		  update(diff) {
-			if (player.ur.unlocked) player.ur.power = player.ur.power.plus(tmp.ur.effect.times(diff));
+			return "which are boosting Point generation by "+format(tmp.ur.effect)+"x"+(tmp.nerdMode?(inChallenge("ne", 11)?"\n (DISABLED)":("\n ("+format(tmp.ur.effectBase)+"x each)")):"")
 		},
-      powerExp() {
-			let exp = new Decimal(1/3);
-      return exp;
-      },
-      powerEff() {
-			  if (!unl(this.layer)) return new Decimal(1);
-			  return player.ur.power.plus(1).pow(this.powerExp());
-		},
-      
-      
-  
+})
+addLayer("up", {
+    name: "ultra prestige", // This is optional, only used in a few places, If absent it just uses the layer id.
+    symbol: "UP", // This appears on the layer's node. Default is the id with the first letter capitalized
+    position: 2, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+    startData() { return {
+        unlocked: true,
+		    points: new Decimal(0),
+        power: new Decimal(0),
+        best: new Decimal(0),
+			  total: new Decimal(0),
+			  pseudoUpgs: [],
+			  first: 0,
+			  auto: false,
+    }},
+    color: "#f58f0b", 
+    requires: new Decimal(1000), // Can be a function that takes requirement increases into account
+    resource: "ultra prestige", // Name of prestige currency
+    baseResource: "prestige points", // Name of resource prestige is based on
+    baseAmount() {return player.r.points}, // Get the current amount of baseResource
+    type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+    exponent: 0.5, // Prestige currency exponent
+    gainMult() { // Calculate the multiplier for main currency from bonuses
+        let mult = new Decimal(1)
+        
+        return mult
+    },
+    canBuyMax() { return hasMilestone("up", 2) },
+    gainExp() { // Calculate the exponent on main currency from bonuses
+        return new Decimal(1)
+    },
+    row: 3, // Row the layer is in on the tree (0 is the first row)
+    hotkeys: [
+        {key: "shift+p", description: "P: Reset for ultra prestige points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+    ],
+    layerShown(){return player.p.unlocked},
 })

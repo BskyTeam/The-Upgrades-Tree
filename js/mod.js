@@ -47,7 +47,7 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0)
 
-	let gain = new Decimal(1)
+	let gain = new Decimal(1000)
   if (hasUpgrade('r', 12)) gain = gain.times(2);
 	if (hasUpgrade('r', 13)) gain = gain.times(2);
 	if (hasUpgrade('r', 14)) gain = gain.times(3);
@@ -57,6 +57,8 @@ function getPointGen() {
   if (hasUpgrade('r', 24)) gain = gain.times(upgradeEffect('r', 24));
   if (hasUpgrade('p', 11)) gain = gain.times(2);
   if (hasChallenge('r', 11)) gain = gain.times(3);
+  
+ 
 	return gain
 }
 
