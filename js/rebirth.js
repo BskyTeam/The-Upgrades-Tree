@@ -343,6 +343,45 @@ addLayer("p", {
     },
 },
 })
+addLayer("$", {
+    name: "money", // This is optional, only used in a few places, If absent it just uses the layer id.
+    symbol: "M", // This appears on the layer's node. Default is the id with the first letter capitalized
+    position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+    startData() { return {
+        unlocked: true,
+		    points: new Decimal(0),
+        power: new Decimal(0),
+        best: new Decimal(0),
+			  total: new Decimal(0),
+			  pseudoUpgs: [],
+			  first: 0,
+			  auto: false,
+    }},
+    color: "#0ce005ff", 
+    requires: new Decimal(1000), // Can be a function that takes requirement increases into account
+    resource: "money", // Name of prestige currency
+    baseResource: "points", // Name of resource prestige is based on
+    baseAmount() {return player.points}, // Get the current amount of baseResource
+    type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+    exponent: 0.5, // Prestige currency exponent
+    gainMult() { // Calculate the multiplier for main currency from bonuses
+        let mult = new Decimal(1)
+        
+        return mult
+    },
+    canBuyMax() { return hasMilestone("$", 2) },
+    resetsNothing() {return true},
+    autoPrestige() {return true},
+    gainExp() { // Calculate the exponent on main currency from bonuses
+        return new Decimal(1)
+    },
+    row: 3, // Row the layer is in on the tree (0 is the first row)
+    hotkeys: [
+        {key: "m", description: "M: Reset for money", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+    ],
+    layerShown(){return player.p.unlocked},
+
+})
 addLayer("ur", {
     name: "ultra rebirth", // This is optional, only used in a few places, If absent it just uses the layer id.
     symbol: "UR", // This appears on the layer's node. Default is the id with the first letter capitalized
@@ -373,7 +412,7 @@ addLayer("ur", {
     gainExp() { // Calculate the exponent on main currency from bonuses
         return new Decimal(1)
     },
-    row: 3, // Row the layer is in on the tree (0 is the first row)
+    row: 4, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
         {key: "shift+u", description: "U: Reset for ultra rebirth points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
@@ -420,7 +459,7 @@ addLayer("up", {
 			  first: 0,
 			  auto: false,
     }},
-    color: "#f58f0b", 
+    color: "#f58f0bff", 
     requires: new Decimal(1000), // Can be a function that takes requirement increases into account
     resource: "ultra prestige", // Name of prestige currency
     baseResource: "prestige points", // Name of resource prestige is based on
@@ -436,7 +475,7 @@ addLayer("up", {
     gainExp() { // Calculate the exponent on main currency from bonuses
         return new Decimal(1)
     },
-    row: 3, // Row the layer is in on the tree (0 is the first row)
+    row: 4, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
         {key: "shift+p", description: "P: Reset for ultra prestige points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
