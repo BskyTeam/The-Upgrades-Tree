@@ -343,7 +343,7 @@ addLayer("p", {
     },
 },
 })
-addLayer("$", {
+addLayer("m", {
     name: "money", // This is optional, only used in a few places, If absent it just uses the layer id.
     symbol: "M", // This appears on the layer's node. Default is the id with the first letter capitalized
     position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
@@ -363,15 +363,15 @@ addLayer("$", {
     baseResource: "points", // Name of resource prestige is based on
     baseAmount() {return player.points}, // Get the current amount of baseResource
     type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
-    exponent: 0.5, // Prestige currency exponent
+    exponent: 0.25, // Prestige currency exponent
     gainMult() { // Calculate the multiplier for main currency from bonuses
         let mult = new Decimal(1)
         
         return mult
     },
-    canBuyMax() { return hasMilestone("$", 2) },
+    canBuyMax() { return hasMilestone("m", 2) },
     resetsNothing() {return true},
-    autoPrestige() {return true},
+    passiveGeneration() { return (hasMilestone("q", 1)&&player.ma.current!="m")?1:0 },
     gainExp() { // Calculate the exponent on main currency from bonuses
         return new Decimal(1)
     },
@@ -379,7 +379,27 @@ addLayer("$", {
     hotkeys: [
         {key: "m", description: "M: Reset for money", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
-    layerShown(){return player.p.unlocked},
+    layerShown(){return player.r.unlocked},
+    upgrades: {
+      11: {
+        title: "Points",
+            description: "Points Boost Itself For Every Zero With It Slowly Increasing",
+            cost: new Decimal(100000),
+            unlocked() { return true },
+            effect() {
+              let eff = player.points.times(.00000001);
+              return eff;
+            },
+            effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" }, // Add formatting to the effect
+      },
+      
+    },
+    milestones: {
+      0: {
+        
+      },
+    },
+  
 
 })
 addLayer("ur", {
@@ -420,8 +440,6 @@ addLayer("ur", {
       effect( ) {
         return new Decimal(1);
         let eff = player.ur.points.plus(1).pow(0.4);
-
-
         return eff
       },
       addToBase() {
@@ -460,10 +478,10 @@ addLayer("up", {
 			  auto: false,
     }},
     color: "#f58f0bff", 
-    requires: new Decimal(1000), // Can be a function that takes requirement increases into account
+    requires: new Decimal(150), // Can be a function that takes requirement increases into account
     resource: "ultra prestige", // Name of prestige currency
     baseResource: "prestige points", // Name of resource prestige is based on
-    baseAmount() {return player.r.points}, // Get the current amount of baseResource
+    baseAmount() {return player.p.points}, // Get the current amount of baseResource
     type: "static", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 0.5, // Prestige currency exponent
     gainMult() { // Calculate the multiplier for main currency from bonuses
@@ -480,4 +498,5 @@ addLayer("up", {
         {key: "shift+p", description: "P: Reset for ultra prestige points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
     layerShown(){return player.p.unlocked},
+  
 })
