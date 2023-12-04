@@ -22,7 +22,7 @@ addLayer("r", {
         if (hasUpgrade("r", 32)) mult = mult.times(1.5)
         if (hasUpgrade("p", 11)) mult = mult.times(1.5)
         if (hasUpgrade("p", 13)) mult = mult.times(1.25)
-        if (hasUpgrade("p", 14)) mult = mult.plus(1)
+        if (hasUpgrade("p",14)) mult = mult.plus(1)
         
         return mult
     },
@@ -240,7 +240,7 @@ microtabs: {
     },
 },
     
-}),
+})
 addLayer("p", {
     name: "prestige", // This is optional, only used in a few places, If absent it just uses the layer id.
     symbol: "P", // This appears on the layer's node. Default is the id with the first letter capitalized
@@ -437,31 +437,7 @@ addLayer("ur", {
         {key: "shift+u", description: "U: Reset for ultra rebirth points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
     layerShown(){return player.r.unlocked},
-      effect( ) {
-        return new Decimal(1);
-        let eff = player.ur.points.plus(1).pow(0.4);
-        return eff
-      },
-      addToBase() {
-			let base = new Decimal(0);
-			return base;
-		},
-      effectBase() {
-			let base = new Decimal(2);
-			
-			// ADD
-			base = base.plus(tmp.ur.addToBase);
-		
-			// MULTIPLY
-			return base.pow(tmp.ur.power);
-		},
-      power() {
-			let power = new Decimal(1);
-			return power;
-		},
-      effectDescription() {
-			return "which are boosting Point generation by "+format(tmp.ur.effect)+"x"+(tmp.nerdMode?(inChallenge("ne", 11)?"\n (DISABLED)":("\n ("+format(tmp.ur.effectBase)+"x each)")):"")
-		},
+      
 })
 addLayer("up", {
     name: "ultra prestige", // This is optional, only used in a few places, If absent it just uses the layer id.
