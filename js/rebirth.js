@@ -491,8 +491,8 @@ addLayer("up", {
     startData() { return {
         unlocked: false,
 		    points: new Decimal(0),
-        power: new Decimal(0),
-        best: new Decimal(0),
+            power: new Decimal(0),
+            best: new Decimal(0),
 			  total: new Decimal(0),
 			  pseudoUpgs: [],
 			  first: 0,
